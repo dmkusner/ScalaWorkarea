@@ -7,9 +7,11 @@ object readCSV {
 	bufferedSource.close
     }
 
-    def parseCSV(csvfile: String): Iterator[Array[String]] = {
+    def parseCSV(csvfile: String): Iterator[Map[String,String]] = {
         val bufferedSource = io.Source.fromFile(csvfile)
-	for (line <- bufferedSource.getLines) yield line.split(",").map(_.trim)
+	val lines = bufferedSource.getLines
+        val header = lines.next.split(",").map(_.trim)
+	for (line <- lines) yield (header zip line.split(",").map(_.trim)).toMap
     }
 
     def main(args: Array[String]): Unit = {
