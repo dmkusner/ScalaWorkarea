@@ -5,11 +5,11 @@ object readCSV {
         val bufferedSource = io.Source.fromFile(csvfile)
 	val lines = bufferedSource.getLines
         val header = lines.next.split(",").map(_.trim)
+	val splitLines = lines.map(_.split(",").map(_.trim))
 
-        for (line <- lines if lines.hasNext) yield {
-	    if (lines.isEmpty) { bufferedSource.close }
-	    val dataMap = (header zip line.split(",").map(_.trim)).toMap
-	    dataMap
+	for (line <- splitLines) yield {
+            val dataMap = (header zip line).toMap
+            dataMap
 	}
     }
 
