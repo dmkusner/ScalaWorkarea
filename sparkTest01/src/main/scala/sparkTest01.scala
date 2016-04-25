@@ -35,12 +35,13 @@ object sparkTest01 {
 	
     	val conf = new SparkConf().setAppName("sparkTest01")
     	val sc = new SparkContext(conf)
-
-	val csvData = sc.parallelize(csvFiles,4)
+        val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+	
+	val csvData = sc.parallelize(csvFiles,10)
 	val rowData = csvData.flatMap(parseCSV)
-
-	val sample = rowData.take(5)
-	sample.foreach(println)
+	val df = sqlContext.createDataFrame(Row(rowData))
+	
+	rowData.take(5).foreach(println)
     }
 
 }
