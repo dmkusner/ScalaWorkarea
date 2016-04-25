@@ -10,19 +10,20 @@ object readCSV {
             resource.close()
         }
 
-    def parseCSV(csvfile: String): IndexedSeq[Map[String,String]] = {
+    def parseCSV(csvfile: String): Iterator[Map[String,String]] = {
         using(io.Source.fromFile(csvfile)) { bufferedSource =>
 	    val lines = bufferedSource.getLines
             val header = lines.next.split(",").map(_.trim)
 	    val splitLines = lines.map(_.split(",").map(_.trim))
 	    val (it1,it2) = splitLines.duplicate
 	    val num = it1.length
-
-	    for (i <- 1 to num) yield {
-	        val line = it2.next
-                val dataMap = (header zip line).toMap
-                dataMap
-            }
+	    
+	    val iter = for (i <- (1 to num).toIterator) yield {
+	    	val line = it2.next
+	    	val dataMap = (header zip line).toMap
+		dataMap
+	    }
+	    iter
 	}
     }
 
