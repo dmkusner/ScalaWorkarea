@@ -1,15 +1,28 @@
 
+import scala.language.reflectiveCalls
+
 object readCSV {
 
-    def parseCSV(csvfile: String): Iterator[Map[String,String]] = {
-        val bufferedSource = io.Source.fromFile(csvfile)
-	val lines = bufferedSource.getLines
-        val header = lines.next.split(",").map(_.trim)
-	val splitLines = lines.map(_.split(",").map(_.trim))
+    def using[A <: { def close(): Unit }, B](resource: A)(f: A => B): B =
+        try {
+            f(resource)
+        } finally {
+            resource.close()
+        }
 
-	for (line <- splitLines) yield {
-            val dataMap = (header zip line).toMap
-            dataMap
+    def parseCSV(csvfile: String): IndexedSeq[Map[String,String]] = {
+        using(io.Source.fromFile(csvfile)) { bufferedSource =>
+	    val lines = bufferedSource.getLines
+            val header = lines.next.split(",").map(_.trim)
+	    val splitLines = lines.map(_.split(",").map(_.trim))
+	    val (it1,it2) = splitLines.duplicate
+	    val num = it1.length
+
+	    for (i <- 1 to num) yield {
+	        val line = it2.next
+                val dataMap = (header zip line).toMap
+                dataMap
+            }
 	}
     }
 
