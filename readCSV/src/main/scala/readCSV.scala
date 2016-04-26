@@ -10,7 +10,9 @@ object readCSV {
             resource.close()
         }
 
-    def parseCSV(csvfile: String): Iterator[Map[String,String]] = {
+    case class Record(uttdate: String, length: String)
+
+    def parseCSV(csvfile: String): Iterator[Record] = {
         using(io.Source.fromFile(csvfile)) { bufferedSource =>
 	    val lines = bufferedSource.getLines
             val header = lines.next.split(",").map(_.trim)
@@ -18,12 +20,12 @@ object readCSV {
 	    val (it1,it2) = splitLines.duplicate
 	    val num = it1.length
 	    
-	    val iter = for (i <- (1 to num).toIterator) yield {
+	    for (i <- (1 to num).toIterator) yield {
 	    	val line = it2.next
-	    	val dataMap = (header zip line).toMap
-		dataMap
+		val dataMap = (header zip line).toMap
+		val record = Record(dataMap("uttdate"), dataMap("length"))
+		record
 	    }
-	    iter
 	}
     }
 
